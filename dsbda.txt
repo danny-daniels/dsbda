@@ -1,0 +1,658 @@
+Assignment 1 – Data Wrangling 1(also known as data cleaning and data munging) 
+
+In pandas Axis=0 refer as row and axis=1 refer as column
+
+Matplotlib- it is library used for creating static and interactive visualizations
+Pandas – It is used for working with datasets, it has functions such as analyzing,cleaning, exploring and manipulating data
+
+Data Wrangling – It is the process of gathering, collecting and transforming raw data in the particular format for better understanding, decision making, accessing and analysis in less time .
+
+Data Normalization -  Process of recognizing data within the database
+
+Data Formatting - It the process of formatting data into common format
+
+1)Data Exploration
+2)Dealing with Null values
+3)Reshaping – Manipulate the data as per requirements and new data can be added and pre-existing data is modified
+
+Implementation-
+import pandas as pd
+
+data=pd.read_csv("ass1.csv")
+df=pd.DataFrame(data)
+df
+
+df.isnull()
+
+df['Data_value'] = df['Data_value'].fillna(df['Data_value'].mean())
+df
+
+#Reshaping  # seasonally adjusted and actual is the column data in column ‘Variable’
+df['Variable']=df['Variable'].map({'Seasonally adjusted':0,'Actual':1}).astype(float)
+df
+
+#Filtering # Data_Value  and gas is the column name 
+df=df[df['Data_value']>=12567]
+df=df.drop(['Gas'],axis=1) 
+df
+
+#Wrangling data by removing Duplication:
+non_duplicate = df[~df.duplicated('Anzsic_description')]
+non_duplicate
+
+#Wrangling Data Using Merge Opration
+stud_detail=pd.DataFrame({
+    'Id':['101','102','103','104','105','106','107','108','109','110'],
+    'Name':['Sanket','Priya','Prajwal','Rushikesh','Diya','Vivek','Athrva','Rutuja','Pooja','Ravi'],
+    'Gender':['M','F','M','M','F','M','M','F','F','M']
+})
+
+stud_marks=pd.DataFrame({
+    'Id':['101','102','103','104','105','106','107','108','109','110'],
+    'Marks':[50,67,70,84,45,77,67,85,96,79]
+})
+
+print(pd.merge(stud_detail, stud_marks, on='Id')) #merge
+
+
+
+
+
+#Wrangling Data Using Grouping Method
+stud_db={
+    'Name':['Sanket','Sanket','Rushikesh','Vivek','Vivek','Rushikesh','Sanket','Prajwal','Prajwal','Athrav'],
+    'Subject':['DSBDA','WT','WT','DSBDA','AI','DSBDA','AI','DSBDA','AI','DSBDA'],
+    'Mark':[78,64,83,42,90,58,76,55,40,88]
+}
+df=pd.DataFrame(stud_db)
+df
+
+grouped = df.groupby('Subject')
+print(grouped.get_group('DSBDA'))
+
+Explanation-
+The given code snippet demonstrates various operations using the pandas library in Python for data manipulation and analysis. Let's go through each step:
+Importing pandas library: The first line of code imports the pandas library and assigns it the alias 'pd'. This alias is commonly used to refer to the pandas library in the subsequent code.
+Reading a CSV file: The pd.read_csv() function is used to read a CSV file named "ass1.csv" and store its contents in the variable data. The data is then converted into a DataFrame using the pd.DataFrame() function and assigned to the variable df.
+Checking for null values: The df.isnull() function is used to identify and display the null values present in the DataFrame df.
+Filling missing values: The code df['Data_value'] = df['Data_value'].fillna(df['Data_value'].mean()) fills the missing values in the 'Data_value' column with the mean value of that column. This is done using the fillna() method provided by pandas.
+Reshaping data: The code df['Variable'] = df['Variable'].map({'Seasonally adjusted':0,'Actual':1}).astype(float) reshapes the data in the 'Variable' column by mapping the values 'Seasonally adjusted' to 0 and 'Actual' to 1. The map() function is used to perform this mapping, and astype(float) converts the values to float data type.
+Filtering data: The code df = df[df['Data_value'] >= 12567] filters the DataFrame df based on a condition where the 'Data_value' should be greater than or equal to 12567. The resulting filtered DataFrame is assigned back to df. Additionally, the code df = df.drop(['Gas'], axis=1) drops the 'Gas' column from the DataFrame using the drop() function with axis=1 indicating column-wise operation.
+Removing duplicates: The code non_duplicate = df[~df.duplicated('Anzsic_description')] removes duplicate rows based on the 'Anzsic_description' column. The duplicated() function identifies duplicate rows, and the ~ operator is used to negate the boolean values, selecting only the non-duplicate rows.
+Merging DataFrames: Two DataFrames, stud_detail and stud_marks, are created with common column 'Id'. The code pd.merge(stud_detail, stud_marks, on='Id') performs an inner join on the 'Id' column, merging the two DataFrames based on that column.
+Grouping data: A dictionary stud_db is created and converted to a DataFrame df. The code grouped = df.groupby('Subject') groups the DataFrame df by the 'Subject' column. The resulting object grouped is a GroupBy object that can be used to perform aggregation or other operations on grouped data. The code grouped.get_group('DSBDA') retrieves the group with the label 'DSBDA' from the grouped data.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Assignment 2- 
+Title: Create an “Academic performance” dataset of students and perform the given
+operations using Python.
+Scipy – Scipy is a collection of mathematical algorithms
+Seaborn library- It is used for data visualization based on the matplotlib 
+
+Implementation-
+import pandas as pd
+import numpy as np
+import seaborn as sns
+from scipy import stats
+import matplotlib.pyplot as plt
+from sklearn.preprocessing import MinMaxScaler, StandardScaler, RobustScaler
+
+data=pd.read_csv("stud_db.csv")
+df=pd.DataFrame(data)
+df
+
+df.info()
+
+df.describe()
+
+df.head(10)
+
+#Filling Null Values
+df['DSBDA'] = df['DSBDA'].fillna(df['DSBDA'].mean())
+df['AI'] = df['AI'].fillna(df['AI'].mean())
+df['WT'] = df['WT'].fillna(df['WT'].mean())
+df['Total'] = df['Total'].fillna(df['Total'].mean())
+df['Average'] = df['Average'].fillna(df['Average'].mean())
+df.head(5)
+#BoxPlot Method
+sns.boxplot(df['Age'])
+
+#Scatter Plot Method
+x=df.Age
+y=df.RollNo
+plt.scatter(x,y,c="Green",s=200)
+plt.show()
+
+#Z-score Method
+data=df.Age
+m=np.mean(data)
+sd=np.std(data)
+print("Mean is :",m)
+print("Standard Deviation is:",sd)
+
+threshold = 3
+outlier = []
+for i in data:
+    z = (i-m)/sd
+    if z > threshold:
+        outlier.append(i)
+print('Outlier in dataset is', outlier)
+
+#IQR (Inter Quartile Range)
+data=np.sort(df.Age)
+Q1 = np.percentile(data, 25, interpolation = 'midpoint') 
+Q2 = np.percentile(data, 50, interpolation = 'midpoint') 
+Q3 = np.percentile(data, 75, interpolation = 'midpoint') 
+ 
+
+print('Q1 25 percentile of the given data is, ', Q1)
+print('Q1 50 percentile of the given data is, ', Q2)
+print('Q1 75 percentile of the given data is, ', Q3)
+ IQR = Q3 - Q1
+print('Interquartile range is', IQR)
+
+low_lim = Q1 - 1.5 * IQR
+up_lim = Q3 + 1.5 * IQR
+print('low_limit is', low_lim)
+print('up_limit is', up_lim)
+outlier =[]
+for x in data:
+    if ((x> up_lim) or (x<low_lim)):
+        outlier.append(x)
+print('Outlier in the dataset is', outlier)
+
+#Removing the Outliers
+df.drop(10, inplace = True)
+df
+
+sns.boxplot(df['Age'])
+
+#Log Transform
+df['log_total'] = np.log2(df['Total'])
+df
+
+#Normal Distribution
+#Z-index Scaling
+z_copy=df.copy()
+for col in ['Average']:
+    z_copy[col]=(z_copy[col]-z_copy[col].mean())/z_copy[col].std()
+sns.displot(z_copy['Average'])
+plt.show()
+
+Explaination-
+Importing libraries: The initial lines of code import the necessary libraries such as pandas (import pandas as pd), numpy (import numpy as np), seaborn (import seaborn as sns), scipy (from scipy import stats), and matplotlib (import matplotlib.pyplot as plt). These libraries provide functions for data analysis, statistical calculations, visualization, and scaling.
+Reading a CSV file: The code data = pd.read_csv("stud_db.csv") reads a CSV file named "stud_db.csv" and stores its contents in the variable data. The data is then converted into a DataFrame using the pd.DataFrame() function and assigned to the variable df.
+Data exploration: The code df.info() displays information about the DataFrame, including the column names, data types, and non-null counts. The code df.describe() provides summary statistics of the DataFrame, including count, mean, standard deviation, minimum, quartiles, and maximum. The code df.head(10) displays the first 10 rows of the DataFrame.
+Handling missing values: The code fills the missing values in specific columns using the mean value of each column. For example, df['DSBDA'] = df['DSBDA'].fillna(df['DSBDA'].mean()) fills the missing values in the 'DSBDA' column with the mean value of that column. Similar operations are performed for other columns.
+Visualization using box plot: The code sns.boxplot(df['Age']) creates a box plot to visualize the distribution of values in the 'Age' column.
+Visualization using scatter plot: The code plt.scatter(x, y, c="Green", s=200) creates a scatter plot to visualize the relationship between 'Age' (x-axis) and 'RollNo' (y-axis) columns.
+Outlier detection using Z-score: The code calculates the Z-scores for the 'Age' column and identifies outliers based on a threshold value. Outliers are those values that fall outside a certain number of standard deviations from the mean.
+Outlier detection using IQR (Interquartile Range): The code calculates the quartiles (Q1, Q2, Q3) and the interquartile range (IQR) for the 'Age' column. It then determines the lower and upper limits for outliers and identifies any values that fall outside these limits.
+Removing outliers: The code df.drop(10, inplace=True) removes a specific row (row index 10) from the DataFrame using the drop() function with inplace=True.
+Log transformation: The code df['log_total'] = np.log2(df['Total']) creates a new column 'log_total' in the DataFrame, which contains the logarithm base 2 of the values in the 'Total' column. This is achieved using the np.log2() function from the numpy library.
+Normal distribution and scaling: The code performs z-index scaling on the 'Average' column by subtracting the mean and dividing by the standard deviation. It then visualizes the distribution using sns.displot() from seaborn.
+
+
+
+
+
+Assignment 3- 
+Provide summary statistics (mean, median, minimum, maximum, standard deviation) for a
+dataset (age, income etc.) with numeric variables grouped by one of the qualitative (categorical)
+variable.
+
+Implementation-
+import pandas as pd
+
+data=pd.read_csv("ass3.csv")
+df=pd.DataFrame(data)
+df
+
+print(df.describe())
+
+print(df.dtypes)
+
+#Mean
+print("Mean of Iris dataset \n",df.groupby('target').mean(),"\n")
+
+#Median
+print("Median of Iris dataset \n",df.groupby('target').median(),"\n")
+
+#Mode
+print("Mode of Iris dataset \n",df.mode(axis=1, numeric_only=True),"\n") #column
+print("Mode of Iris dataset \n",df.mode(axis=0, numeric_only=False),"\n") #row
+
+#Standard Deviation
+print("STD of Iris dataset \n",df.groupby('target').std(),"\n")
+
+#Varience
+print("Variance of Iris dataset \n",df.groupby('target').var(),"\n")
+#Maximum
+print("Max of Iris dataset \n",df.groupby('target').max(),"\n")
+
+#Minimum
+print("Min of Iris dataset \n",df.groupby('target').min(),"\n")
+
+
+Explanation-
+Importing pandas library: The first line of code imports the pandas library and assigns it the alias 'pd'. This alias is commonly used to refer to the pandas library in the subsequent code.
+Reading a CSV file: The code data=pd.read_csv("ass3.csv") reads a CSV file named "ass3.csv" and stores its contents in the variable data. The data is then converted into a DataFrame using the pd.DataFrame() function and assigned to the variable df.
+Displaying DataFrame: The code df simply displays the DataFrame df, which contains the data from the CSV file.
+Descriptive statistics:
+a. df.describe(): The code print(df.describe()) generates descriptive statistics of the DataFrame, including count, mean, standard deviation, minimum, quartiles, and maximum for each numerical column.
+b. df.dtypes: The code print(df.dtypes) displays the data types of each column in the DataFrame.
+c. Mean: The code print("Mean of Iris dataset \n",df.groupby('target').mean(),"\n") calculates the mean value for each column in the DataFrame grouped by the 'target' column. It provides the mean values for each target category separately.
+d. Median: The code print("Median of Iris dataset \n",df.groupby('target').median(),"\n") calculates the median value for each column in the DataFrame grouped by the 'target' column. It provides the median values for each target category separately.
+e. Mode: The code print("Mode of Iris dataset \n",df.mode(axis=1, numeric_only=True),"\n") calculates the mode value for each row in the DataFrame, considering only numeric values. The code print("Mode of Iris dataset \n",df.mode(axis=0, numeric_only=False),"\n") calculates the mode value for each column in the DataFrame. It provides the most frequent value for each column.
+f. Standard Deviation: The code print("STD of Iris dataset \n",df.groupby('target').std(),"\n") calculates the standard deviation for each column in the DataFrame grouped by the 'target' column. It provides the standard deviation values for each target category separately.
+g. Variance: The code print("Variance of Iris dataset \n",df.groupby('target').var(),"\n") calculates the variance for each column in the DataFrame grouped by the 'target' column. It provides the variance values for each target category separately.
+h. Maximum: The code print("Max of Iris dataset \n",df.groupby('target').max(),"\n") calculates the maximum value for each column in the DataFrame grouped by the 'target' column. It provides the maximum values for each target category separately.
+i. Minimum: The code print("Min of Iris dataset \n",df.groupby('target').min(),"\n") calculates the minimum value for each column in the DataFrame grouped by the 'target' column. It provides the minimum values for each target category separately.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Assignment 4 –
+Create a Linear Regression Model using Python/R to predict home prices using Boston
+Housing Dataset (https://www.kaggle.com/c/boston-housing).
+
+Implementation-
+
+import pandas as pd
+import numpy as np
+
+from sklearn.datasets import load_boston
+boston_dataset = load_boston()
+
+boston = pd.DataFrame(boston_dataset.data, columns=boston_dataset.feature_names)
+boston.head()
+
+boston['MEDV'] = boston_dataset.target
+
+boston.isnull().sum()
+
+X = pd.DataFrame(np.c_[boston['LSTAT'], boston['RM']], columns = ['LSTAT','RM'])
+Y = boston['MEDV']
+
+from sklearn.linear_model import LinearRegression
+
+reg = LinearRegression()
+
+from sklearn.model_selection import train_test_split
+x_train, x_test, y_train, y_test = train_test_split(X, Y, test_size=0.33, random_state=42)
+reg.fit(x_train, y_train)
+
+
+y_pred = reg.predict(x_test)
+print(y_pred)
+
+y_pred[2]
+y_test[0]
+
+print(np.mean((y_pred-y_test)**2)) #by numpy
+
+from sklearn.metrics import mean_squared_error #by sklearn
+print(mean_squared_error(y_test, y_pred))
+
+Explanation-
+Importing libraries: The code imports the necessary libraries, including pandas (import pandas as pd), numpy (import numpy as np), scikit-learn's load_boston dataset (from sklearn.datasets import load_boston), linear regression model (from sklearn.linear_model import LinearRegression), train-test split function (from sklearn.model_selection import train_test_split), and mean squared error metric (from sklearn.metrics import mean_squared_error).
+Loading and exploring the dataset: The code boston_dataset = load_boston() loads the Boston Housing dataset. It then creates a pandas DataFrame named boston using the dataset's data and assigns the feature names as column names.
+Adding the target variable: The code boston['MEDV'] = boston_dataset.target adds a new column 'MEDV' to the DataFrame boston, which represents the target variable (median value of owner-occupied homes in $1000s).
+Checking for missing values: The code boston.isnull().sum() checks for missing values in the DataFrame boston. It prints the sum of missing values for each column.
+Preparing the input features and target variable: The code creates two DataFrames, X and Y. X contains the input features 'LSTAT' (percentage of lower status of the population) and 'RM' (average number of rooms per dwelling). Y represents the target variable 'MEDV'.
+Creating and training the linear regression model: The code creates a LinearRegression object named reg using LinearRegression(). It then splits the data into training and testing sets using train_test_split, where 33% of the data is allocated for testing. The model is trained on the training data using reg.fit(x_train, y_train).
+Making predictions: The code y_pred = reg.predict(x_test) uses the trained model to make predictions on the testing data x_test.
+Evaluating the model: The code print(np.mean((y_pred-y_test)**2)) calculates the mean squared error (MSE) between the predicted values y_pred and the actual values y_test using numpy. It prints the MSE as a measure of the model's performance. Additionally, the code print(mean_squared_error(y_test, y_pred)) achieves the same using scikit-learn's mean_squared_error function.
+Assignment 5-
+Implement logistic regression using Python/R to perform classification on
+Social_Network_Ads.csv dataset.
+Implementation-
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+
+dataset.head()
+
+df=pd.DataFrame(dataset)
+df
+
+#X and Y define  
+X = df.iloc[:,[2,3]].values
+y = df.iloc[:,4].values
+
+print(X[:3,:])
+print('-'*15)
+print(y[:3])
+
+#splitting dataset into traning set and testing set 
+from sklearn.model_selection import train_test_split
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.25, random_state = 0)
+
+print(X_train[:3])
+print('-'*15)
+print(y_train[:3])
+
+print(X_test[:3])
+print('-'*15)
+print(y_test[:3])
+
+#feature scaling
+from sklearn.preprocessing import StandardScaler
+sc = StandardScaler()
+X_train = sc.fit_transform(X_train)
+X_test = sc.transform(X_test)
+
+print(X_train[:3])
+print('-'*15)
+print(X_test[:3])
+
+#Fitting Logistic Regression Model 
+from sklearn.linear_model import LogisticRegression
+classifier = LogisticRegression(random_state = 0)
+classifier.fit(X_train, y_train)
+
+y_pred = classifier.predict(X_test)
+
+print(y_pred)
+
+from sklearn.metrics import confusion_matrix,classification_report
+
+cm = confusion_matrix(y_test, y_pred)
+cl_report=classification_report(y_test,y_pred)
+
+print(cm)
+
+print(cl_report)
+
+
+
+
+Explanation-
+Importing libraries: The code imports the necessary libraries, including pandas (import pandas as pd), numpy (import numpy as np), and scikit-learn's logistic regression model (from sklearn.linear_model import LogisticRegression), train-test split function (from sklearn.model_selection import train_test_split), standard scaler (from sklearn.preprocessing import StandardScaler), and evaluation metrics (from sklearn.metrics import confusion_matrix, classification_report).
+Creating a DataFrame: The code df=pd.DataFrame(dataset) creates a pandas DataFrame named df from an existing dataset. The dataset is assumed to be previously defined.
+Defining X and y: The code X = df.iloc[:,[2,3]].values and y = df.iloc[:,4].values define the input features X and the target variable y. In this case, X contains columns 2 and 3 of the DataFrame, and y contains column 4.
+Splitting the dataset: The code X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.25, random_state = 0) splits the dataset into training and testing sets. It allocates 25% of the data for testing.
+Feature scaling: The code applies feature scaling using a standard scaler. It scales the features in both the training and testing sets using sc.fit_transform(X_train) and sc.transform(X_test).
+Fitting the logistic regression model: The code classifier = LogisticRegression(random_state = 0) creates an instance of the logistic regression model. It then fits the model to the training data using classifier.fit(X_train, y_train).
+Making predictions: The code y_pred = classifier.predict(X_test) uses the trained logistic regression model to make predictions on the testing data X_test.
+Evaluating the model: The code cm = confusion_matrix(y_test, y_pred) calculates the confusion matrix based on the predicted values y_pred and the actual values y_test. The code cl_report = classification_report(y_test, y_pred) generates a classification report that includes precision, recall, F1-score, and support.
+Printing the results: The code print(cm) and print(cl_report) print the confusion matrix and classification report, respectively, to evaluate the performance of the logistic regression model.
+
+
+
+
+
+
+
+
+
+Assignment 8-
+1. Use the inbuilt dataset 'titanic'. The dataset contains 891 rows and contains information about
+the passengers who boarded the unfortunate Titanic ship. Use the Seaborn library to see if we can
+find any patterns in the data.
+2. Write a code to check how the price of the ticket (column name: 'fare') for each passenger is
+distributed by plotting a histogram
+
+Implementation-
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+dataset = sns.load_dataset('titanic')
+dataset.head()
+
+sns.distplot(dataset['fare'])
+
+sns.distplot(dataset['fare'], kde=False)
+
+sns.distplot(dataset['fare'], kde=False, bins=10)
+
+sns.jointplot(x='age', y='fare', data=dataset)
+
+sns.jointplot(x='age', y='fare', data=dataset, kind='hex')
+
+sns.rugplot(dataset['fare'])
+
+sns.barplot(x='sex', y='age', data=dataset)
+
+sns.countplot(x='sex', data=dataset)
+sns.boxplot(x='sex', y='age', data=dataset)
+
+sns.boxplot(x='sex', y='age', data=dataset, hue="survived")
+
+sns.violinplot(x='sex', y='age', data=dataset)
+
+sns.violinplot(x='sex', y='age', data=dataset, hue='survived')
+
+sns.stripplot(x='sex', y='age', data=dataset, jitter=False)
+
+sns.stripplot(x='sex', y='age', data=dataset)
+
+sns.stripplot(x='sex', y='age', data=dataset, jitter=True, hue='survived')
+
+
+Explanation-
+Distplot: It shows the distribution of a univariate (single variable) dataset. The code sns.distplot(dataset['fare']) creates a histogram with a kernel density estimate (KDE) plot overlayed. The parameter kde=False removes the KDE plot, and bins=10 specifies the number of bins for the histogram.
+Jointplot: It displays the relationship between two variables along with their individual distributions. The code sns.jointplot(x='age', y='fare', data=dataset) creates a scatter plot with histograms on the side for each variable. The parameter kind='hex' replaces the scatter plot with a hexagonal binning plot.
+Rugplot: It draws a small vertical tick at each observation point along the x-axis. The code sns.rugplot(dataset['fare']) creates a rug plot for the 'fare' variable.
+Barplot: It shows the relationship between a categorical variable and a continuous variable. The code sns.barplot(x='sex', y='age', data=dataset) creates a bar plot that displays the average age for each category of the 'sex' variable.
+Countplot: It shows the count of occurrences of each category in a categorical variable. The code sns.countplot(x='sex', data=dataset) creates a count plot for the 'sex' variable.
+Boxplot: It displays the distribution of a continuous variable across different categories. The code sns.boxplot(x='sex', y='age', data=dataset) creates a box plot that shows the distribution of ages for each category of the 'sex' variable. The parameter hue="survived" adds another dimension to the plot by distinguishing survived and non-survived passengers.
+Violinplot: It combines a box plot with a KDE plot to show the distribution of a continuous variable across different categories. The code sns.violinplot(x='sex', y='age', data=dataset) creates a violin plot that displays the distribution of ages for each category of the 'sex' variable. The parameter hue='survived' adds another dimension to the plot by distinguishing survived and non-survived passengers.
+Stripplot: It shows the distribution of a continuous variable across different categories by placing individual data points along the category axis. The code sns.stripplot(x='sex', y='age', data=dataset) creates a strip plot that displays the ages of passengers for each category of the 'sex' variable. The parameter jitter=True adds a random noise to the data points to avoid overlapping.
+Stripplot with Hue: It extends the strip plot by adding another dimension using the hue parameter. The code sns.stripplot(x='sex', y='age', data=dataset, jitter=True, hue='survived') displays the ages of passengers for each category of the 'sex' variable, and differentiates survived and non-survived passengers using different colors.
+
+A. Distribution Plots
+a. Dist-Plot
+b. Joint Plot
+d. Rug Plot
+
+B. Categorical Plots
+a. Bar Plot
+b. Count Plot
+c. Box Plot
+d. Violin Plot
+
+C. Advanced Plots
+a. Strip Plot
+b. Swarm Plot
+
+D. Matrix Plots
+a. Heat Map
+b. Cluster Map
+
+
+Assignment- 9
+Title: Data Visualization
+Aim: 1. Use the inbuilt dataset 'titanic' as used in the above problem. Plot a box plot for
+distribution of age with respect to each gender along with the information about whether they
+survived or not. (Column names : 'sex' and 'age').
+2. Write observations on the inference from the above statistics.
+
+Implementation-
+import pandas as pd
+import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
+from seaborn import load_dataset
+
+df=pd.read_csv('titanic.csv')
+
+df.head()
+
+df.describe()
+
+df.info()
+
+df.isnull().sum()
+
+df['Age']=df['Age'].fillna(np.mean(df['Age']))
+df['Fare']=df['Fare'].fillna(np.mean(df['Fare']))
+df['Cabin']=df['Cabin'].fillna(df['Cabin'].mode()[0])
+
+df.isnull().sum()
+
+sns.boxplot(x='Sex',y="Age", data=df)
+sns.boxplot(x='Sex',y="Age",data=df, hue="Survived")
+plt.show()
+
+sns.boxplot(x="Sex", y="Age", data=df, hue="Survived")
+
+df=pd.read_csv('train.csv')
+
+df.head()
+
+df.isnull().sum()
+
+df['Age']=df['Age'].fillna(np.mean(df['Age']))
+df['Cabin']=df['Cabin'].fillna(df['Cabin'].mode()[0])
+df['Embarked']=df['Embarked'].fillna(df['Embarked'].mode()[0])
+
+sns.boxplot(df['Sex'], df['Age'], hue=df['Survived'])
+
+sns.barplot(df['Sex'], df['Age'], hue=df['Survived'])
+
+sns.barplot(df['Pclass'],df['Fare'],hue=df['Sex'])
+
+heatmap-
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+dataset = sns.load_dataset('titanic')
+dataset.head()
+
+dataset.corr()
+
+corr = dataset.corr()
+sns.heatmap(corr)
+
+corr = dataset.corr()
+sns.heatmap(corr, annot=True)
+
+
+import seaborn as sns
+dataset = sns.load_dataset('titanic')
+
+sns.histplot(dataset['fare'], kde=False, bins=10)
+
+Data Loading and Cleaning:
+In the first section, the code loads the 'titanic.csv' file into a DataFrame using pd.read_csv('titanic.csv').
+It then performs some initial exploratory data analysis by displaying the first few rows with df.head(), summary statistics with df.describe(), and information about the DataFrame with df.info().
+The code checks for missing values using df.isnull().sum() and handles missing values by filling the 'Age' column with the mean value using df['Age']=df['Age'].fillna(np.mean(df['Age'])), the 'Fare' column with the mean value using df['Fare']=df['Fare'].fillna(np.mean(df['Fare'])), and the 'Cabin' column with the mode value using df['Cabin']=df['Cabin'].fillna(df['Cabin'].mode()[0]).
+Data Visualization using Seaborn and Matplotlib:
+The code uses various visualization techniques to explore relationships between variables and analyze the data.
+Box plots are created using sns.boxplot() to visualize the distribution of age ('Age') for different categories ('Sex', 'Survived'). The hue parameter is used to differentiate the plots based on the 'Survived' column.
+Bar plots are created using sns.barplot() to compare variables such as age ('Age') and fare ('Fare') for different categories ('Sex', 'Survived', 'Pclass').
+Heatmaps are created using sns.heatmap() to visualize the correlation matrix of the dataset. The annot parameter is set to True to display the correlation values within the heatmap.
+Histograms are created using sns.histplot() to visualize the distribution of the 'fare' column with the number of bins set to 10.
+
+
+Assignment 10-
+Title: Data Visualization III
+Download the Iris flower dataset or any other dataset into a DataFrame. (e.g.,
+https://archive.ics.uci.edu/ml/datasets/Iris ). Scan the dataset and give the inference as:
+1. List down the features and their types (e.g., numeric, nominal) available in the
+dataset. 2. Create a histogram for each feature in the dataset to illustrate the feature
+distributions. 3. Create a box plot for each feature in the dataset.
+4. Compare distributions and identify outliers.
+
+Implementation-
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.datasets import load_iris
+
+df=pd.read_csv('iris.csv')
+
+df.head()
+
+df.tail()
+
+df.isnull().sum()
+
+#List down the features and their types (e.g., numeric, nominal) available in the dataset.
+print("\n\nThe features in the dataset are as follows : ")
+print("1. Sepal length : ", df['sepal_length'].dtype)
+print("2. Sepal width : ", df['sepal_width'].dtype)
+print("3. Petal length : ", df['petal_length'].dtype)
+print("4. Petal width : ", df['petal_width'].dtype)
+print("5. Species : ", df['species'].dtype)
+#Create a boxplot for each feature in the dataset
+sns.boxplot(df['sepal_length'])
+
+sns.boxplot(df['sepal_width'])
+
+sns.boxplot(df['petal_length'])
+
+sns.boxplot(df['petal_width'])
+
+#Compare distributions and identify outliers.
+sns.boxplot(df['sepal_length'], df['species'])
+
+sns.boxplot(df['petal_length'], df['species'])
+
+
+
+Explanation-
+
+Data Loading and Cleaning:
+The code loads the 'iris.csv' file into a DataFrame using pd.read_csv('iris.csv').
+It displays the first few rows of the DataFrame using df.head() and the last few rows using df.tail().
+The code checks for missing values using df.isnull().sum().
+Feature Analysis and Visualization:
+The code lists down the features available in the dataset and their corresponding data types using print() statements.
+Box plots are created using sns.boxplot() to visualize the distribution of each feature in the dataset. Separate box plots are created for 'sepal_length', 'sepal_width', 'petal_length', and 'petal_width'.
+Additionally, box plots are created to compare the distributions of features across different species of iris flowers. The 'species' column is used as the categorical variable to differentiate the box plots
+
+
+
+
+
